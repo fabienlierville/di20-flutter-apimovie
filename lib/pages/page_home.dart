@@ -1,5 +1,9 @@
 import 'package:api_movies/models/api_movie.dart';
 import 'package:api_movies/models/movie.dart';
+import 'package:api_movies/widgets/chargement.dart';
+import 'package:api_movies/widgets/custom_text.dart';
+import 'package:api_movies/widgets/error_page.dart';
+import 'package:api_movies/widgets/movie_list.dart';
 import 'package:flutter/material.dart';
 
 class PageHome extends StatefulWidget {
@@ -10,7 +14,12 @@ class PageHome extends StatefulWidget {
 }
 
 class _PageHomeState extends State<PageHome> {
-  List<Movie> movies = [];
+
+  @override
+  void initState() {
+    getPopularMovie();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,21 +33,40 @@ class _PageHomeState extends State<PageHome> {
           )
         ],
       ),
-      body: Center(),
+      body: FutureBuilder<List<Movie>>(
+        future: getPopularMovie(),
+        builder: (context, snapshot){
+          print(snapshot.connectionState.toString());
+          switch(snapshot.connectionState){
+            case ConnectionState.waiting: return Chargement();
+            default:
+              if(snapshot.hasError){
+                return ErrorPage();
+              }else{
+                if(snapshot.data == null){
+                  return Center(child: CustomText("no Movies"),);
+                }
+                return MovieList(movies: snapshot.data!);
+              }
+          }
+        },
+      ),
     );
   }
 
-  Future<void> getPopularMovie() async{
+
+
+
+  Future<List<Movie>> getPopularMovie() async{
+    List<Movie> movies = [];
     ApiMovie api = ApiMovie();
     Map<String,dynamic> map =  await api.getPopular();
+    await Future.delayed(Duration(seconds: 3));
     if(map["code"] == 200){
       movies = Movie.moviesFromApi(map["body"]);
       movies.shuffle();
-      movies.forEach((Movie movie) {
-        print(movie.title);
-      });
-    }else{
-      //Todo
     }
+    return movies;
   }
 }
+

@@ -26,4 +26,8 @@ class Movie{
     return l;
   }
 
+  String getImage(){
+    return "https://www.themoviedb.org/t/p/w600_and_h600_bestv2/${this.imageUrl}";
+  }
+
 }
