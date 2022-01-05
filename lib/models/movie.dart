@@ -21,6 +21,7 @@ class Movie{
         releaseDate: DateTime.parse(data["release_date"]),
         vote: double.tryParse( data["vote_average"].toString()) ?? 0
       );
+      l.add(movie);
     });
     return l;
   }
