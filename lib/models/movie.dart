@@ -19,7 +19,7 @@ class Movie{
         overview: data["overview"],
         imageUrl: data["poster_path"],
         releaseDate: DateTime.parse(data["release_date"]),
-        vote: double.tryParse( data["vote"].toString()) ?? 0
+        vote: double.tryParse( data["vote_average"].toString()) ?? 0
       );
     });
     return l;
